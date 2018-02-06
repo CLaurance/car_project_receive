@@ -18,6 +18,7 @@ const int PWMPropulsionPin = 5;
 // direction
 const int motor3 = 8;
 const int motor4 = 9;
+const int PWMPropulsionPin_braquage = 10;
 
 void setup()
 {
@@ -54,21 +55,29 @@ void loop() {
 
   if (propulsion == FORWARD) {
     digitalWrite(motor1, LOW);
-    digitalWrite(motor2, HIGH);  }
+    digitalWrite(motor2, HIGH);
+    analogWrite(vitesse, PWMPropulsionPin);
+  }
 
 
   if (propulsion == BACKWARD) {
     digitalWrite(motor1, HIGH);
-    digitalWrite(motor2, LOW);  }
+    digitalWrite(motor2, LOW);
+    analogWrite(vitesse, PWMPropulsionPin);
+  }
 
 
 
   if (direction == TURN_RIGHT) {
     digitalWrite(motor3, LOW);
-    digitalWrite(motor4, HIGH);  }
+    digitalWrite(motor4, HIGH);
+    analogWrite(braquage, PWMPropulsionPin_braquage);
+  }
 
   if (direction == TURN_LEFT) {
     digitalWrite(motor3, HIGH);
-    digitalWrite(motor4, LOW);  }
+    digitalWrite(motor4, LOW);
+    analogWrite(braquage, PWMPropulsionPin_braquage);
+  }
   }
 }
