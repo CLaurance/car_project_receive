@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <RH_ASK.h>
 #include <SPI.h> // Not actualy used but needed to compile
 
@@ -10,16 +11,6 @@ const int BACKWARD = 2;
 const int TURN_RIGHT = 4;
 const int TURN_LEFT = 8;
 
-// propulsion
-const int motor1 = 6;
-const int motor2 = 7;
-const int PWMPropulsionPin = 5;
-
-// direction
-const int motor3 = 8;
-const int motor4 = 9;
-const int PWMPropulsionPin_braquage = 10;
-
 void setup()
 {
   Serial.begin(9600); // Debugging only
@@ -30,17 +21,16 @@ void setup()
 
 void loop() {
   //uint8_t buf[RH_ASK_MAX_MESSAGE_LEN];
-  int orders[4] = {0};
+  int orders[4];
   uint8_t buflen = sizeof(orders);
 
   //if (driver.recv(buf, &buflen)) // Non-blocking
   if (driver.recv((uint8_t*)orders, &buflen)) //if data is not an array, use &receivedData
   {
+
     for (byte i = 0; i < 4; i++)
     {
-      Serial.print(orders[i]);
-      Serial.print('\t');
-      Serial.println(orders[i],HEX);
+      Serial.println(orders[i]);
     }
 
     int propulsion;
@@ -53,31 +43,41 @@ void loop() {
     direction=orders[2];
     braquage=orders[3];
 
-  if (propulsion == FORWARD) {
-    digitalWrite(motor1, LOW);
-    digitalWrite(motor2, HIGH);
-    analogWrite(vitesse, PWMPropulsionPin);
+    if (propulsion == FORWARD) {
+      // Serial.println("avant");
+      digitalWrite(6, HIGH);
+      digitalWrite(7, LOW);
+      analogWrite(A0, vitesse);
+    }
+    else if (propulsion == BACKWARD) {
+      digitalWrite(6, LOW);
+      digitalWrite(7, HIGH);
+      analogWrite(A0, vitesse);
+    }
+    else if (propulsion == NO_ORDER) {
+      digitalWrite(6, LOW);
+      digitalWrite(7, LOW);
+      analogWrite(A0, vitesse);
+    }
+    if (direction == TURN_RIGHT) {
+      digitalWrite(8, LOW);
+      digitalWrite(9, HIGH);
+      analogWrite(A1, braquage);
+    }
+    if (direction == TURN_LEFT) {
+      digitalWrite(8, HIGH);
+      digitalWrite(9, LOW);
+      analogWrite(A1, braquage);
+    }
+    if (direction == NO_ORDER) {
+      digitalWrite(8, LOW);
+      digitalWrite(9, LOW);
+      analogWrite(A1, braquage);
+    }
+  Serial.println("====RECEIVED=========");
   }
-
-
-  if (propulsion == BACKWARD) {
-    digitalWrite(motor1, HIGH);
-    digitalWrite(motor2, LOW);
-    analogWrite(vitesse, PWMPropulsionPin);
-  }
-
-
-
-  if (direction == TURN_RIGHT) {
-    digitalWrite(motor3, LOW);
-    digitalWrite(motor4, HIGH);
-    analogWrite(braquage, PWMPropulsionPin_braquage);
-  }
-
-  if (direction == TURN_LEFT) {
-    digitalWrite(motor3, HIGH);
-    digitalWrite(motor4, LOW);
-    analogWrite(braquage, PWMPropulsionPin_braquage);
-  }
-  }
+  else {
+    Serial.println("====NO MESS=========");
+}
+  delay(1000);
 }
